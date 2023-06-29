@@ -1,4 +1,5 @@
 def Hi():
-  print('Hello world')
+  for i in range(5):
+    print('Hello world')
 
 Hi()
