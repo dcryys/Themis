@@ -20,12 +20,18 @@ Attention on file .credentials.txt, it should be in .gitignore
 """
 def read_credentials():
     global TELEGRAM_TOKEN
+    print("Reading credentials...")
     with open(".credentials.txt", "r") as f:
+        print("File opened")
         TELEGRAM_TOKEN = f.readline().strip()
+        print("Token read")
+
+
 """
 Telegram bot answer to /hello command
 """
 def hello_command(update: Update, context: CallbackContext) -> None:
+    print(f'User {update.effective_user.first_name} called /hello')
     update.message.reply_text(f'Hello {update.effective_user.first_name}!')
 
 """
@@ -34,18 +40,24 @@ Main body of Telegram bot handling loop
 def telegram_func():
     global TELEGRAM_TOKEN
 
+    print("Entered function telegram_func()")
     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
+    print("Updater created")
     dispatcher = updater.dispatcher
+    print("Dispatcher created")
 
     dispatcher.add_handler(CommandHandler("hello", hello_command))
+    print("Command handler added")
 
     updater.start_polling()
+    print("Polling started, going into loop")
     updater.idle()
 
 """
 Main function, entry point of the program
 """
 def main():
+    print("Bot is starting!")    
     read_credentials()
     telegram_func()
 
