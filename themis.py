@@ -7,6 +7,7 @@ Serving justice to the world
 
 import os
 import sys
+from datetime import datetime
 #  pip install python-telegram-bot --upgrade
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -35,6 +36,15 @@ def hello_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(f'Hello {update.effective_user.first_name}!')
 
 """
+Command /time =)
+"""
+def time_command(update: Update, context: CallbackContext) -> None:
+    print(f'User {update.effective_user.first_name} called /time')
+    the_datetime = datetime.now()
+    currnet_time = the_datetime.time()
+    update.message.reply_text(f'The time is {currnet_time}')
+
+"""
 Main body of Telegram bot handling loop
 """
 def telegram_func():
@@ -47,7 +57,9 @@ def telegram_func():
     print("Dispatcher created")
 
     dispatcher.add_handler(CommandHandler("hello", hello_command))
-    print("Command handler added")
+    print("Command /hello handler added")
+    dispatcher.add_handler(CommandHandler("time", time_command))
+    print("Command /time handler added")
 
     updater.start_polling()
     print("Polling started, going into loop")
@@ -57,7 +69,7 @@ def telegram_func():
 Main function, entry point of the program
 """
 def main():
-    print("Bot is starting!")    
+    print("Bot is starting..")    
     read_credentials()
     telegram_func()
 
