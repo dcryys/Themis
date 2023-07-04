@@ -42,7 +42,8 @@ def time_command(update: Update, context: CallbackContext) -> None:
     print(f'User {update.effective_user.first_name} called /time')
     the_datetime = datetime.now()
     currnet_time = the_datetime.time()
-    update.message.reply_text(f'The time is {currnet_time}')
+    update.message.reply_text(f'Current time is {currnet_time.strftime("%H:%M:%S")}')
+
 
 """
 Main body of Telegram bot handling loop
