@@ -38,7 +38,16 @@ def time_command(update: Update, context: CallbackContext) -> None:
     the_datetime = datetime.now()
     currnet_time = the_datetime.time()
     update.message.reply_text(f'Current time is {currnet_time.strftime("%H:%M:%S")}')
-
+    
+"""
+Command /datetime
+"""
+def datetime_command(update: Update, context: CallbackContext) -> None:
+    print(f'User {update.effective_user.first_name} called /datetime')
+    today = datetime.now()
+    current_time = today.time()
+    update.message.reply_text(f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}')
+    
 """
 Function that is the main body of July
 """
@@ -55,6 +64,8 @@ def telegram_func():
     print("Command /hello handler added")
     dispatcher.add_handler(CommandHandler("time", time_command))
     print("Command /time handler added")
+    dispatcher.add_handler(CommandHandler("datetime", datetime_command))
+    print("Command /datetime handler added")
 
     updater.start_polling()
     print("Polling started, going into loop")
