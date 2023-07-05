@@ -61,8 +61,9 @@ Make it speak
 def tellme_command(update: Update, context: CallbackContext) -> None:
     print(f'User {update.effective_user.first_name} called /tellme')
     text = update.effective_message.text
+    text = text.replace("/tellme","",1)
     answer = ai1.ask_gpt3(text)
-    print(f'User sent us: {update.effective_message.text}')
+    print(f'User sent us: {text}')
     update.message.reply_text(answer)
     
 """
