@@ -8,6 +8,7 @@ Serving justice to the world
 import os
 import sys
 from datetime import datetime
+import ephem
 import ai1
 #  pip install python-telegram-bot --upgrade
 from telegram import Update, ForceReply
@@ -52,11 +53,25 @@ def datetime_command(update: Update, context: CallbackContext) -> None:
     print(f'User {update.effective_user.first_name} called /datetime')
     today = datetime.now()
     current_time = today.time()
-    update.message.reply_text(f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}')
-
+    now = ephem.now
+    observer = ephem.Observer()
+    observer.lon = '0'
+    observer.lat = '0'
+    moon = ephem.Moon()
+    moon.compute(observer)
+    phase = moon.phase
+    if phase < 0.03 or phase >= 0.97:
+        ph_name = 'New Moon'
+    elif phase < 0.47:
+        ph_name = 'First Quarter'
+    elif phase < 0.53:
+        ph_name = 'Full Moon'
+    elif phase < 0.97:
+        ph_name = 'Last Quarter'
+    update.message.reply_text(f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}. Current moon phase: {ph_name}')
 
 """
-Make it speak
+Make it speak!
 """
 def tellme_command(update: Update, context: CallbackContext) -> None:
     print(f'User {update.effective_user.first_name} called /tellme')
