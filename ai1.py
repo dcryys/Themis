@@ -5,11 +5,12 @@ OPENAI_KEY=""
 
 # key is in .openai.key if it is exist
 # is file exist?
-if os.path.isfile(".openai.txt"):
-    with open(".openai.txt") as f:
-        OPENAI_KEY = f.read().strip()
 
 def ask_gpt3(question, personality="You are AI assistant"):
+    if os.path.isfile(".openai.txt"):
+        with open(".openai.txt") as f:
+            OPENAI_KEY = f.read().strip()
+
     if len(OPENAI_KEY) == 0:
         return "OPENAI_KEY not available. This is simulated answer."
 
