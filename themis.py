@@ -60,6 +60,7 @@ async def datetime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     moon = ephem.Moon()
     moon.compute(today)
     phase = moon.phase / 100
+    m_percent = round(moon.phase)
     if phase < 0.03 or phase >= 0.97:
         ph_name = 'New Moon'
     if phase >= 0.03 and phase < 0.47:
@@ -68,7 +69,7 @@ async def datetime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         ph_name = 'Full Moon'
     if phase < 0.97 and phase >= 0.53:
         ph_name = 'Last Quarter'
-    await update.message.reply_text(f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}. Current moon phase: {ph_name}')
+    await update.message.reply_text(f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}. Current moon phase: {ph_name} ({m_percent}%)')
 
 """
 Make it speak!
