@@ -18,7 +18,7 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
       - name: SCP to server
         run: |
-          git clone -b release https://github.com/nuclearcat/Themis
+          git clone -b main https://github.com/nuclearcat/Themis
           scp -r -o StrictHostKeyChecking=no Themis/*.py themis@${{ secrets.SSH_HOST }}:~/Themis
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
