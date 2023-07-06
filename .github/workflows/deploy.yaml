@@ -5,6 +5,7 @@ on:
 # deploy ubuntu
 jobs:
   deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Install SSH key
@@ -19,7 +20,7 @@ jobs:
       - name: SCP to server
         run: |
           git clone -b release https://github.com/nuclearcat/Themis
-          scp -r -o StrictHostKeyChecking=no *.py themis@${{ secrets.SSH_HOST }}:~/Themis
+          scp -r -o StrictHostKeyChecking=no Themis/*.py themis@${{ secrets.SSH_HOST }}:~/Themis
         with:
           SSH_HOST: ${{ secrets.SSH_HOST }}
       - name: Restart systemd service
