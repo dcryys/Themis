@@ -1,0 +1,19 @@
+[Unit]
+# systemd python themis bot service
+Description=themis bot service
+After=network.target
+
+[Service]
+Type=simple
+User=themis
+Group=themis
+WorkingDirectory=/home/themis/Themis
+ExecStart=/usr/bin/python3 /home/themis/Themis/themis.py
+Restart=on-failure
+# Restart Delay 10sec retry 3 times
+RestartSec=10
+StartLimitInterval=0
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target
