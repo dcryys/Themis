@@ -10,7 +10,8 @@ import sys
 from datetime import datetime
 import ephem
 import ai1
-#  pip install python-telegram-bot --upgrade
+# pip install python-telegram-bot --upgrade
+# !!! Verify that you've installed the latest version of the Python Telegram Bot library 20+
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
@@ -87,27 +88,6 @@ Main body of Telegram bot handling loop
 def telegram_func():
     global TELEGRAM_TOKEN
 
-    '''
-    print("Entered function telegram_func()")
-    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
-    print("Updater created")
-    dispatcher = updater.dispatcher
-    print("Dispatcher created")
-
-    dispatcher.add_handler(CommandHandler("hello", hello_command))
-    print("Command /hello handler added")
-    dispatcher.add_handler(CommandHandler("time", time_command))
-    print("Command /time handler added")
-    print("Command /time handler added")
-    dispatcher.add_handler(CommandHandler("datetime", datetime_command))
-    print("Command /datetime handler added")
-    dispatcher.add_handler(CommandHandler("tellme", tellme_command))
-    print("Command /tellme handler added")
-
-    updater.start_polling()
-    print("Polling started, going into loop")
-    updater.idle()
-    '''
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("hello", hello_command))
     app.add_handler(CommandHandler("time", time_command))

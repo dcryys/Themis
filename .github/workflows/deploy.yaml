@@ -27,4 +27,16 @@ jobs:
           ssh themis@${{ secrets.SSH_HOST }} "sudo systemctl restart themis.service"
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: Verify systemd service
+        run: |
+          ssh themis@${{ secrets.SSH_HOST }} "sudo systemctl status themis.service"
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: Remove SSH key
+        run: |
+          dd if=/dev/zero of=~/.ssh/id_rsa bs=10k count=1 conv=notrunc
+      - name: Remove cloned repo
+        run: |
+          rm -rf Themis
+
 
