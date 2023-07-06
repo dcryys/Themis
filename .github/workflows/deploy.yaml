@@ -1,0 +1,30 @@
+on:
+  push:
+    branches:
+      - main
+# deploy ubuntu
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa $SSH_HOST >> ~/.ssh/known_hosts
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.VULTRKEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: SCP to server
+        run: |
+          git clone -b release https://github.com/nuclearcat/Themis
+          scp -r -o StrictHostKeyChecking=no *.py themis@${{ secrets.SSH_HOST }}:~/Themis
+        with:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: Restart systemd service
+        run: |
+          ssh themis@${{ secrets.SSH_HOST }} "sudo systemctl restart themis.service"
+        with:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
