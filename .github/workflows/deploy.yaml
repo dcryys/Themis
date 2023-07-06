@@ -14,18 +14,18 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa $SSH_HOST >> ~/.ssh/known_hosts
-        with:
+        env:
           SSH_PRIVATE_KEY: ${{ secrets.VULTRKEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
       - name: SCP to server
         run: |
           git clone -b release https://github.com/nuclearcat/Themis
           scp -r -o StrictHostKeyChecking=no Themis/*.py themis@${{ secrets.SSH_HOST }}:~/Themis
-        with:
+        env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
       - name: Restart systemd service
         run: |
           ssh themis@${{ secrets.SSH_HOST }} "sudo systemctl restart themis.service"
-        with:
+        env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
 
