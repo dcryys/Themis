@@ -54,20 +54,19 @@ async def datetime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     print(f'User {update.effective_user.first_name} called /datetime')
     today = datetime.now()
     current_time = today.time()
-    now = ephem.now
     observer = ephem.Observer()
     observer.lon = '0'
     observer.lat = '0'
     moon = ephem.Moon()
-    moon.compute(observer)
-    phase = moon.phase
+    moon.compute(today)
+    phase = moon.phase / 100
     if phase < 0.03 or phase >= 0.97:
         ph_name = 'New Moon'
-    elif phase < 0.47:
+    if phase >= 0.03 and phase < 0.47:
         ph_name = 'First Quarter'
-    elif phase < 0.53:
+    if phase >= 0.47 and phase < 0.53:
         ph_name = 'Full Moon'
-    elif phase < 0.97:
+    if phase < 0.97 and phase >= 0.53:
         ph_name = 'Last Quarter'
     await update.message.reply_text(f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}. Current moon phase: {ph_name}')
 
