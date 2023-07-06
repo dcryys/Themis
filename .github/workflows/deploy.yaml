@@ -1,0 +1,42 @@
+on:
+  push:
+    branches:
+      - main
+# deploy ubuntu
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VULTRKEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: SCP to server
+        run: |
+          git clone -b main https://github.com/nuclearcat/Themis
+          scp -r -o StrictHostKeyChecking=no Themis/*.py themis@${{ secrets.SSH_HOST }}:~/Themis
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: Restart systemd service
+        run: |
+          ssh themis@${{ secrets.SSH_HOST }} "sudo systemctl restart themis.service"
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: Verify systemd service
+        run: |
+          ssh themis@${{ secrets.SSH_HOST }} "sudo systemctl status themis.service"
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+      - name: Remove SSH key
+        run: |
+          dd if=/dev/zero of=~/.ssh/id_rsa bs=10k count=1 conv=notrunc
+      - name: Remove cloned repo
+        run: |
+          rm -rf Themis
+
+

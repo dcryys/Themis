@@ -10,9 +10,10 @@ import sys
 from datetime import datetime
 import ephem
 import ai1
-#  pip install python-telegram-bot --upgrade
-from telegram import Update, ForceReply
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+# pip install python-telegram-bot --upgrade
+# !!! Verify that you've installed the latest version of the Python Telegram Bot library 20+
+from telegram import ForceReply, Update
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
 TELEGRAM_TOKEN = ""
 
@@ -33,23 +34,23 @@ def read_credentials():
 """
 Telegram bot answer to /hello command
 """
-def hello_command(update: Update, context: CallbackContext) -> None:
+async def hello_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print(f'User {update.effective_user.first_name} called /hello')
-    update.message.reply_text(f'Hello {update.effective_user.first_name}!')
+    await update.message.reply_text(f'Hello {update.effective_user.first_name}!')
 
 """
 Command /time =)
 """
-def time_command(update: Update, context: CallbackContext) -> None:
+async def time_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print(f'User {update.effective_user.first_name} called /time')
     the_datetime = datetime.now()
     currnet_time = the_datetime.time()
-    update.message.reply_text(f'Current time is {currnet_time.strftime("%H:%M:%S")}')
+    await update.message.reply_text(f'Current time is {currnet_time.strftime("%H:%M:%S")}')
 
 """
 Command /datetime
 """
-def datetime_command(update: Update, context: CallbackContext) -> None:
+async def datetime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print(f'User {update.effective_user.first_name} called /datetime')
     today = datetime.now()
     current_time = today.time()
@@ -68,18 +69,18 @@ def datetime_command(update: Update, context: CallbackContext) -> None:
         ph_name = 'Full Moon'
     elif phase < 0.97:
         ph_name = 'Last Quarter'
-    update.message.reply_text(f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}. Current moon phase: {ph_name}')
+    await update.message.reply_text(f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}. Current moon phase: {ph_name}')
 
 """
 Make it speak!
 """
-def tellme_command(update: Update, context: CallbackContext) -> None:
+async def tellme_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     print(f'User {update.effective_user.first_name} called /tellme')
     text = update.effective_message.text
     text = text.replace("/tellme","",1)
     answer = ai1.ask_gpt3(text)
     print(f'User sent us: {text}')
-    update.message.reply_text(answer)
+    await update.message.reply_text(answer)
     
 """
 Main body of Telegram bot handling loop
@@ -87,25 +88,12 @@ Main body of Telegram bot handling loop
 def telegram_func():
     global TELEGRAM_TOKEN
 
-    print("Entered function telegram_func()")
-    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
-    print("Updater created")
-    dispatcher = updater.dispatcher
-    print("Dispatcher created")
-
-    dispatcher.add_handler(CommandHandler("hello", hello_command))
-    print("Command /hello handler added")
-    dispatcher.add_handler(CommandHandler("time", time_command))
-    print("Command /time handler added")
-    print("Command /time handler added")
-    dispatcher.add_handler(CommandHandler("datetime", datetime_command))
-    print("Command /datetime handler added")
-    dispatcher.add_handler(CommandHandler("tellme", tellme_command))
-    print("Command /tellme handler added")
-
-    updater.start_polling()
-    print("Polling started, going into loop")
-    updater.idle()
+    app = Application.builder().token(TELEGRAM_TOKEN).build()
+    app.add_handler(CommandHandler("hello", hello_command))
+    app.add_handler(CommandHandler("time", time_command))
+    app.add_handler(CommandHandler("datetime", datetime_command))
+    app.add_handler(CommandHandler("tellme", tellme_command))
+    app.run_polling()
 
 """
 Main function, entry point of the program
