@@ -67,27 +67,45 @@ async def datetime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     observer = ephem.Observer()
     observer.lon = '0'
     observer.lat = '0'
+    observer.date = ephem.now()
     moon = ephem.Moon()
-    moon.compute(today)
+    moon.compute(observer)
     phase = moon.phase / 100
     m_percent = round(moon.phase)
-    if phase < 0.03 or phase >= 0.97:
-        ph_name = 'New Moon'
-    if phase >= 0.03 and phase < 0.47:
-        ph_name = 'First Quarter'
-    if phase >= 0.47 and phase < 0.53:
-        ph_name = 'Full Moon'
-    if phase < 0.97 and phase >= 0.53:
-        ph_name = 'Last Quarter'
+    new_m = ephem.next_new_moon(today)
+    date_new_m = new_m.datetime()
+    d_ans = date_new_m - today
+    days_dif = d_ans.days
+    if days_dif <= 15:
+        if phase >= 0.97:
+            ph_name = 'Full Moon'
+        elif phase <= 0.03:
+            ph_name = 'New Moon'
+        elif phase > 0.03 and phase < 0.47:
+            ph_name = "Waning Crescent"
+        elif phase >= 0.47 and phase <= 0.53:
+            ph_name = "Third Quater"
+        elif phase > 0.53 and phase < 0.97:
+            ph_name = "Waning Gibbous"
+    else:
+        if phase >= 0.97:
+            ph_name = 'Full Moon'
+        elif phase <= 0.03:
+            ph_name = 'New Moon'
+        elif phase > 0.03 and phase < 0.47:
+            ph_name = "Waxing Crescent"
+        elif phase >= 0.47 and phase <= 0.53:
+            ph_name = "First Quater"
+        elif phase > 0.53 and phase < 0.97:
+            ph_name = "Waxing Gibbous"
     answer_datetime = f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}. Current moon phase: {ph_name} ({m_percent}%)'
-    await update.message.reply_text(answer_datetime)
+    update.message.reply_text(answer_datetime)
     logging.info(f'Bot answered: {answer_datetime}')
     
 """
 Make it speak!
 """
 async def tellme_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    print(f'User {update.effective_user.first_name} called /tellme')
     text = update.effective_message.text
     text = text.replace("/tellme ","",1)
     logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /tellme: "{text}"')
