@@ -99,7 +99,7 @@ async def datetime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         elif phase > 0.53 and phase < 0.97:
             ph_name = "Waxing Gibbous"
     answer_datetime = f'Today is {today.strftime("%A")}, the {today.strftime("%d")} of {today.strftime("%B")}, {today.strftime("%Y")}, {current_time.strftime("%H:%M:%S")}. Current moon phase: {ph_name} ({m_percent}%)'
-    update.message.reply_text(answer_datetime)
+    await update.message.reply_text(answer_datetime)
     logging.info(f'Bot answered: {answer_datetime}')
     
 """
