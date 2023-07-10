@@ -120,9 +120,9 @@ Command /retrieve
 async def retrieve_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         with dbm.open(ST, 'r') as db:
-            return db[update.effective_user.username]
+            await update.message.reply_text(db[update.effective_user.username])
     except KeyError:
-        return None
+        await update.message.reply_text("Nothing there :(")
         
 """
 Command /store
