@@ -11,13 +11,14 @@ from datetime import datetime
 import ephem
 import ai1
 import logging
+import dbm
 # pip install python-telegram-bot --upgrade
 # !!! Verify that you've installed the latest version of the Python Telegram Bot library 20+
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
 TELEGRAM_TOKEN = ""
-
+ST = 'storage.dbm'
 """
 Logging
 """
@@ -114,6 +115,26 @@ async def tellme_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     logging.info(f'Bot answered: {answer_tellme}')
     
 """
+Command /retrieve
+"""
+async def retrieve_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    try:
+        with dbm.open(ST, 'r') as db:
+            return db[update.effective_user.username]
+    except KeyError:
+        return None
+        
+"""
+Command /store
+"""
+async def store_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    string = update.effective_message.text
+    string = string.replace("/store ","",1)
+    logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /store: {string}')
+    with dbm.open(ST, 'c') as db:
+        db[update.effective_user.id] = string
+
+"""
 Main body of Telegram bot handling loop
 """
 def telegram_func():
@@ -124,6 +145,8 @@ def telegram_func():
     app.add_handler(CommandHandler("time", time_command))
     app.add_handler(CommandHandler("datetime", datetime_command))
     app.add_handler(CommandHandler("tellme", tellme_command))
+    app.add_handler(CommandHandler("store", store_command))
+    app.add_handler(CommandHandler("retrieve", retrieve_command))
     app.run_polling()
 
 """
