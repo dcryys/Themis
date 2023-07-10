@@ -118,22 +118,28 @@ async def tellme_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 Command /retrieve
 """
 async def retrieve_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /retrieve')
     try:
+        key = str(update.effective_user.id)
         with dbm.open(ST, 'r') as db:
-            await update.message.reply_text(db[update.effective_user.username])
+            answer_retrieve = bytes.decode(db[key], 'utf-8')
+            await update.message.reply_text(answer_retrieve)
+            logging.info(f'Bot answered: {answer_retrieve}')
     except KeyError:
-        await update.message.reply_text("Nothing there :(")
+        answer_wrong_retrieve = "Nothing there :("
+        await update.message.reply_text(answer_wrong_retrieve)
+        logging.info(f'Bot answered: {answer_wrong_retrieve}')
         
 """
 Command /store
 """
 async def store_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    string = update.effective_message.text
-    string = string.replace("/store ","",1)
-    logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /store: {string}')
+    str_text = update.effective_message.text
+    str_text = str_text.replace("/store ","",1)
+    key = str(update.effective_user.id) 
+    logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /store: {str_text}')
     with dbm.open(ST, 'c') as db:
-        db[update.effective_user.id] = string
-
+        db[key] = str_text
 """
 Main body of Telegram bot handling loop
 """
