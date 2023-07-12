@@ -19,6 +19,8 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 
 TELEGRAM_TOKEN = ""
 ST = 'storage.dbm'
+RL = 'roles.dbm'
+
 """
 Logging
 """
@@ -140,6 +142,25 @@ async def store_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /store: {str_text}')
     with dbm.open(ST, 'c') as db:
         db[key] = str_text
+
+"""
+Command /who
+"""
+async def who_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /who')
+    roleid = str(update.effective_user.id)
+    with dbm.open(RL, "c") as db:
+        if roleid in db:
+            role = bytes.decode(db[roleid], 'utf-8')
+            answer_exist = f"You are a/an {role}"
+            await update.message.reply_text(answer_exist)
+            logging.info(f'Bot answered: {answer_exist}')
+        else: 
+            db[roleid] = 'user'
+            answer_notexist = "You were not in our database. Now you've become a user"
+            await update.message.reply_text(answer_notexist)
+            logging.info(f'Bot answered: {answer_notexist}')
+
 """
 Main body of Telegram bot handling loop
 """
@@ -153,6 +174,7 @@ def telegram_func():
     app.add_handler(CommandHandler("tellme", tellme_command))
     app.add_handler(CommandHandler("store", store_command))
     app.add_handler(CommandHandler("retrieve", retrieve_command))
+    app.add_handler(CommandHandler("who", who_command))
     app.run_polling()
 
 """
