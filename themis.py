@@ -12,6 +12,7 @@ import ephem
 import ai1
 import logging
 import dbm
+import csv
 # pip install python-telegram-bot --upgrade
 # !!! Verify that you've installed the latest version of the Python Telegram Bot library 20+
 from telegram import ForceReply, Update
@@ -20,6 +21,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 TELEGRAM_TOKEN = ""
 ST = 'storage.dbm'
 RL = 'roles.dbm'
+AR = 'airports.csv'
 
 """
 Logging
@@ -162,6 +164,37 @@ async def who_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             logging.info(f'Bot answered: {answer_notexist}')
 
 """
+Command /airport
+"""
+async def airport_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    countrycode = update.effective_message.text
+    countrycode = countrycode.replace("/airport ","", 1)
+    logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /airport with country code: {countrycode}')
+    with open(AR, "r", encoding = 'utf-8') as file:
+        reader = csv.reader(file, delimiter =',', quoting=csv.QUOTE_ALL, skipinitialspace=True)
+        airpsline = []
+        counter = 0
+        answer_airport = ''
+
+        for row in reader:
+            if row[8] == countrycode:
+                airpsline.append(row)
+                counter = counter + 1
+            if counter == 5:
+                break
+        for counter_1 in range(0,counter):
+            the_link = 'http://www.google.com/maps/place/' + airpsline[counter_1][4] + ','+ airpsline[counter_1][5]
+            answer_airport = f'{answer_airport} \nThe name of the airport: {airpsline[counter_1][3]}. (There is the link to google maps: {the_link}). \n '
+
+        if len(airpsline) > 0:
+            await update.message.reply_text(answer_airport)
+            logging.info(f'Bot answered: {answer_airport}')
+        else:
+            answer_nocode = "Sorry, I don't know this country code. Please, check it and try again."
+            await update.message.reply_text(answer_nocode)
+            logging.info(f'Bot answered: {answer_nocode}')
+                
+"""
 Main body of Telegram bot handling loop
 """
 def telegram_func():
@@ -175,6 +208,7 @@ def telegram_func():
     app.add_handler(CommandHandler("store", store_command))
     app.add_handler(CommandHandler("retrieve", retrieve_command))
     app.add_handler(CommandHandler("who", who_command))
+    app.add_handler(CommandHandler("airport", airport_command))
     app.run_polling()
 
 """
