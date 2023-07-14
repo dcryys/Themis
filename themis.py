@@ -193,7 +193,27 @@ async def airport_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             answer_nocode = "Sorry, I don't know this country code. Please, check it and try again."
             await update.message.reply_text(answer_nocode)
             logging.info(f'Bot answered: {answer_nocode}')
-                
+
+"""
+Catching a file
+"""
+
+async def catch_csv (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    file = await context.bot.get_file(update.message.document.file_id)
+    await file.download_to_drive('user_file.csv')
+    logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) has sent csv file to the bot. It was received successfully and named "user_file.csv".')
+    counter = 0
+    first_line = []
+    with open('user_file.csv',"r", encoding='utf-8') as csvfile:
+        for row in csvfile:
+           counter = counter + 1
+           if counter == 2:
+                first_line.append(row)
+                answer_catch = f'I have received your file. There is the first line: {first_line}'
+                await update.message.reply_text(answer_catch)
+                logging.info(f'Bot answered: {answer_catch}')
+                break
+
 """
 Main body of Telegram bot handling loop
 """
@@ -209,6 +229,7 @@ def telegram_func():
     app.add_handler(CommandHandler("retrieve", retrieve_command))
     app.add_handler(CommandHandler("who", who_command))
     app.add_handler(CommandHandler("airport", airport_command))
+    app.add_handler(MessageHandler(filters.Document.FileExtension('csv'), catch_csv))
     app.run_polling()
 
 """
