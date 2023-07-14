@@ -22,6 +22,7 @@ TELEGRAM_TOKEN = ""
 ST = 'storage.dbm'
 RL = 'roles.dbm'
 AR = 'airports.csv'
+HS = 'horoscopes.dbm'
 
 """
 Logging
