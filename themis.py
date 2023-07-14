@@ -215,6 +215,29 @@ async def catch_csv (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
                 break
 
 """
+Command /horoscope 
+"""
+async def horoscope_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    zodiac = update.effective_message.text
+    zodiac = zodiac.replace("/horoscope ", "", 1)
+    user_info = str(update.effective_user.id)
+    date_info = datetime.now()
+    date_info = date_info.strftime("%d/%m/%Y")
+    logging.info(f'User {update.effective_user.id} ({update.effective_user.username}) called /horoscope for the zodiac sign: {zodiac}')
+    
+    with dbm.open(HS, 'c') as db:
+        if (user_info in db) and (date_info in db[user_info]) and (zodiac in db[user_info][date_info]):
+            answer_already_exists = bytes.decode(db[user_info][date_info][zodiac], 'utf-8')
+            await update.message.reply_text(answer_already_exists)
+            logging.info(f'Bot answered: {answer_already_exists}')
+        else:
+            text_for_openai = f'Create a horoscope for today for {zodiac}'
+            answer_ai = ai1.ask_gpt3(text_for_openai)
+            db[user_info][date_info][zodiac] = answer_ai
+            await update.message.reply_text(answer_ai)
+            logging.info(f'Bot answered: {answer_ai}')   
+            
+"""
 Main body of Telegram bot handling loop
 """
 def telegram_func():
@@ -230,6 +253,7 @@ def telegram_func():
     app.add_handler(CommandHandler("who", who_command))
     app.add_handler(CommandHandler("airport", airport_command))
     app.add_handler(MessageHandler(filters.Document.FileExtension('csv'), catch_csv))
+    app.add_handler(CommandHandler("horoscope", horoscope_command))
     app.run_polling()
 
 """
